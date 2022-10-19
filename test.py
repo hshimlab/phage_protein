@@ -1,11 +1,13 @@
 from Bio import SeqIO
 import re
 import itertools
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
 #from collections import Counter
 # file_name = "Ecoli_phage_all.fasta"    #fasta file name
 # whole data number = 52261
 # removed data number = 20959
-# length of dic = 2942
+# length of dic = 2941
 def fasta_seq(file_name):
     all_species=[]    # remove the '|' in the description part
     protein_name=[]   # make the list for classifying protein Name
@@ -31,156 +33,146 @@ def fasta_seq(file_name):
         lower_alphabet=lower_alphabet.lower()
         lower_protein_revised.append(lower_alphabet)
 
+# make the list of whole proteins.
+########################################################################################################################
+# extract all kind of proteins
 
+    list_extend_all=[] # make the list for all kind of proteins
+    for words in lower_protein_revised:
+        words_repeat= words.split(' ')
+        words_repeat = [x for x in words_repeat if x != ''] # many proteins contains ''(not meaningful), and remove them
+        list_extend_all.extend(words_repeat) # merge the multiple lists as one list
+
+
+
+    protein_dic_all_words = {}  # To count the duplicate words, make the dictionary
+    for key in list_extend_all:
+       if key in protein_dic_all_words:
+           protein_dic_all_words[key]+=1  # If duplicated proteins are, add +1 for counting
+       else:
+           protein_dic_all_words[key]=1   # If there are not duplicated proteins, remain as 1
+
+    sorted_proteins_all = sorted(protein_dic_all_words.items(), key=lambda x: x[1], reverse=True) #To check how many duplicated proteins are, It was sorted with arphabetically order
+
+    all_candidate= ['tail', 'dna', 'baseplate', 'fiber', 'endonuclease', 'polymerase', 'reductase', 'capsid', 'rna', 'wedge', 'terminase', 'assembly', 'head', 'atpase', 'hub', 'prohead', 'recombination', 'aaa', 'conserved', 'helicase', 'transcription', 'core', 'ligase', 'lysis', 'inhibitor', 'regulator', 'hydrolase', 'protease', 'membrane', 'completion', 'kinase', 'neck', 'transcriptional', 'holin', 'sheath', 'portal', 'thioredoxin', 'connector', 'synthase', 'anaerobic', 'binding', 'thymidylate', 'outer', 'factor', 'hnh', 'nuclease', 'internal', 'host', 'ribonucleoside-triphosphate']
+    # all_candidate consists of proteins which are over at least 200
+
+    dic_list_all = dict(
+        (name, protein_dic_all_words[name]) for name in all_candidate if name in protein_dic_all_words)
+    # This code extracts proteins which are over 200
+
+    # This code is used to make wordcloud figure
+    #wordcloud = WordCloud(width=1000, height=500).generate_from_frequencies(dic_list_all)
+
+    #plt.figure(figsize=(15, 8))
+    #plt.imshow(wordcloud)
+
+    #names = list(dic_list_all.keys())
+    #values = list(dic_list_all.values())
+    #plt.barh(names, values)
+    #plt.ylabel('All', fontweight='bold', color='black', fontsize='15', horizontalalignment='center')
+    #plt.yticks(fontsize=10)
+    #plt.show()
+########################################################################################################################
 
     removed_protein = [elements for elements in lower_protein_revised if 'hypothetical' not in elements]
     removed_protein_final = [elements for elements in removed_protein if 'putative' not in elements]
     # upper codes remove the useless words 'hypothetical and putative'
 
+    #non_duplicate = list(dict.fromkeys(removed_protein_final))
+    removed_protein_final = [elements for elements in removed_protein_final if 'putatove' not in elements]
 
-    add_capsid = [elements for elements in removed_protein_final if 'capsid' in elements]
-    #print(len(add_capsid)) # checking for original number of capsid proteins
-    add_capsid = list(dict.fromkeys(add_capsid))  # remove the duplicate protein in the list
-    #print(len(add_capsid)) # checking for removed duplicate proteins 587->56
-    #print(add_capsid)
-    add_nucleic_acid = [elements for elements in removed_protein_final if 'nucle' in elements]
-    #print(len(add_nucleic_acid)) # checking for original number of nucleic_acid proteins
-    add_nucleic_acid = list(dict.fromkeys(add_nucleic_acid)) # remove the duplicate protein in the list
-    #print(len(add_nucleic_acid)) # checking for removed duplicate proteins 2041->239
-    #print(add_nucleic_acid)
-    add_collar = [elements for elements in removed_protein_final if 'collar' in elements]
-    #print(len(add_collar)) # checking for original number of collar proteins
-    add_collar = list(dict.fromkeys(add_collar)) # remove the duplicate protein in the list
-    #print(len(add_collar)) # checking for removed duplicate proteins 7->5
-    #print(add_collar)
-    add_whiskers = [elements for elements in removed_protein_final if 'whiskers' in elements]
-    #print(len(add_whiskers)) # checking for original number of whiskers proteins
-    add_whiskers = list(dict.fromkeys(add_whiskers)) # remove the duplicate protein in the list
-    #print(len(add_whiskers)) # checking for removed duplicate proteins 19->6
-    #print(add_whiskers)
-    add_sheath = [elements for elements in removed_protein_final if 'sheath' in elements]
-    #print(len(add_sheath)) # checkin for original number of sheath proteins
-    add_sheath = list(dict.fromkeys(add_sheath)) # remove the duplicate protein in the list
-    #print(len(add_sheath)) # checking for removed duplicate proteins 298->19
-    #print(add_sheath)
-    add_baseplate = [elements for elements in removed_protein_final if 'baseplate' in elements]
-    #print(len(add_baseplate)) # checking for original number of basplate proteins
-    add_baseplate = list(dict.fromkeys(add_baseplate)) # remove the duplicate protein in the list
-    #print((len(add_baseplate))) # checking for removed duplicate proteins 1172->83
-    #print(add_baseplate)
-    add_tail_fiber = [elements for elements in removed_protein_final if 'tail fiber' in elements]
-    #print(len(add_tail_fiber)) # checking for original number of tail fiber proteins
-    add_tail_fiber = list(dict.fromkeys(add_tail_fiber)) # remove the duplicate protein in the list
-    #print(len(add_tail_fiber)) # checking for removed duplicate proteins 915->109
-    #print(add_tail_fiber)
-    add_spike = [elements for elements in removed_protein_final if 'spike' in elements]
-    #print(len(add_spike))  # checing for original number of spike proteins
-    add_spike = list(dict.fromkeys(add_spike)) # remove the duplicate protein in the list
-    #print(len(add_spike)) # checking for removed duplicate proteins    31->15
-    #print(add_spike)
+    list_extend_function=[]
+    for words in removed_protein_final:
+        words_repeat= words.split(' ')
+        words_repeat = [x for x in words_repeat if x != '']
+        list_extend_function.extend(words_repeat)
 
-    classified_proteins = itertools.chain(add_capsid,add_nucleic_acid,add_collar,add_whiskers,add_sheath,add_baseplate,add_tail_fiber,add_spike)
-    classified_proteins=list(classified_proteins) # merge the proteins which are only related to phage structures
+    protein_dic_function_words = {}  # make the dictionary for format like protein_name: sequence IDs (Some sequences can have the same protein)
+    for key in list_extend_function:  # Protein name
+        if key in protein_dic_function_words:
+            protein_dic_function_words[key] += 1
+        else:
+            protein_dic_function_words[key] = 1
 
+    sorted_proteins_function = sorted(protein_dic_function_words.items(), key=lambda x: x[1], reverse=True)
+    #print(sorted_proteins_function)
+    function_candidate= ['tail', 'dna', 'baseplate', 'fiber', 'endonuclease', 'polymerase', 'reductase', 'capsid', 'wedge', 'rna', 'terminase', 'assembly', 'atpase', 'head', 'hub', 'prohead', 'aaa', 'recombination', 'lysis', 'core', 'inhibitor', 'transcription', 'ligase', 'hydrolase', 'regulator', 'helicase', 'completion', 'protease',  'kinase', 'sheath', 'thioredoxin', 'connector', 'transcriptional', 'portal', 'synthase', 'anaerobic', 'neck', 'binding']
+    print(len(function_candidate))
+    dic_list_function = dict(
+        (name, protein_dic_function_words[name]) for name in function_candidate if name in protein_dic_function_words)
 
-    origin_seq=[]      # This code will retrun the lower case alphabet protein to origin alphabet
-    for i in range(len(lower_protein_revised)):
-        if lower_protein_revised[i] in classified_proteins:
-            origin_seq.append(i)   # This code extract the sequence of proteins which were converted into lower case
+    #print(dic_list_function)
+    #wordcloud = WordCloud(width=1000, height=500).generate_from_frequencies(dic_list_function)
 
-    origin_protein=[]
-    for number in origin_seq:
-        origin_protein.append(protein_revised[int(number)]) # extract origin name of proteins
+    #plt.figure(figsize=(15, 8))
+    #plt.imshow(wordcloud)
+    #names = list(dic_list_function.keys())
+    #values = list(dic_list_function.values())
+    #plt.barh(names, values)
+    #plt.ylabel('Function', fontweight='bold', color='black', fontsize='15', horizontalalignment='center')
+    #plt.yticks(fontsize=10)
+    #plt.show()
 
+########################################################################################################################
+# hypothetical classification
 
-    #origin_protein = list(dict.fromkeys(origin_protein))  # remove the duplicate protein in the list
-                                                           # The value was increased, This can be guessed because it did not merge lower cases alphabet and upper cases alphabet
+    removed_protein_hypothetical = [elements for elements in lower_protein_revised if 'hypothetical' in elements]
 
-    protein_dic={}     # make the dictionary for format like protein_name: sequence IDs (Some sequences can have the same protein)
-    for key in origin_protein:   # Protein name
-        for value in Number_of_ID:   # Sequence ID
-            if key in protein_dic:   # If there are not protein name in the dictionary, add the new protein name
-                protein_dic[key]+=[value]
-            else:
-                protein_dic[key]=[value]  # If there are protein name in the dictionary, add the new Sequence ID in the value part
-            Number_of_ID.remove(value)
+    list_extend_hypothetical = []
+    for words in removed_protein_hypothetical:
+        words_repeat = words.split(' ')
+        words_repeat = [x for x in words_repeat if x != '']
+        list_extend_hypothetical.extend(words_repeat)
 
-            break    # stop the loop if there are no Sequence ID in the Protein name list
-    return protein_dic
-    '''
-    This Part is used to distinguish unique words, but it is not yet complete code
-    
-    #print(sorted(protein_dic.keys()))
-    #words= sorted(protein_dic.keys())
-    #print(words)
-    #words_list=[]
-    #for word in words:
-    #    words_repeat=word.replace('_',' ')
-    #    words_repeat= words_repeat.replace('-',' ').split(' ')
-    #    words_repeat = [x for x in words_repeat if x != '' and  x !='protein']
-     #   words_list.append(words_repeat)
+    protein_dic_hypothetical_words = {}  # make the dictionary for format like protein_name: sequence IDs (Some sequences can have the same protein)
+    for key in list_extend_hypothetical:  # Protein name
+        if key in protein_dic_hypothetical_words:
+            protein_dic_hypothetical_words[key] += 1
+        else:
+            protein_dic_hypothetical_words[key] = 1
 
-    #print(words_list)
-    #count = 0
-    #counting_list = []
-    #checking_list=[]
-    #for compare in words:
-    #    for repeated_example in words_list:
-     #       for compare2 in repeated_example:
-     #           if compare2 in compare:
-      #              count+=1
-      #  counting_list.append(count)
-      #  if count<300:
-       #     checking_list.append(compare)
-       # count=0
+    sorted_proteins_hypothetical = sorted(protein_dic_hypothetical_words.items(), key=lambda x: x[1], reverse=True)
+    #print(sorted_proteins_hypothetical)
+########################################################################################################################
+# putative classification
 
-    #print(checking_list)
+    removed_protein_putative = [elements for elements in lower_protein_revised if 'putative' in elements]
+    removed_protein_plus = [elements for elements in lower_protein_revised if 'putatove' in elements]
+    removed_protein_putative.extend(removed_protein_plus)
 
 
+    list_extend_putative = []
+    for words in removed_protein_putative:
+        words_repeat = words.split(' ')
+        words_repeat = [x for x in words_repeat if x != '']
+        list_extend_putative.extend(words_repeat)
 
-    #unique =[]
-    #count=0
-    #counting_list=[]
-    #print(len(words))
-    #for i in range(len(words)):
-     #   for words_counting in words:
-      #      if str(words[i]) in words_counting:
-       #         count+=1
-       # unique.append(count)
-       # if count >1:
-        #    counting_list.append(i)
-        #count=0
-    #print(len(words))
-    #print(counting_list)
-    #words_remove= sorted(protein_dic.keys())
-    #for i in range(len(words)):
-     #   for j in range(len(counting_list)):
-      #      if i== int(counting_list[j]):
-       #         words_remove.remove(words[i])
-    #print(len(words))
-    #print(len(words_remove))
-    #print(words_remove)
+    protein_dic_putative_words = {}  # make the dictionary for format like protein_name: sequence IDs (Some sequences can have the same protein)
+    for key in list_extend_putative:  # Protein name
+        if key in protein_dic_putative_words:
+            protein_dic_putative_words[key] += 1
+        else:
+            protein_dic_putative_words[key] = 1
+
+    sorted_proteins_putative = sorted(protein_dic_putative_words.items(), key=lambda x: x[1], reverse=True)
+    #print(sorted_proteins_putative)
+    putative_candidate=['tail', 'dna', 'endonuclease', 'fiber', 'head', 'helicase', 'recombination', 'holin', 'baseplate', 'membrane', 'neck', 'terminase', 'reductase', 'internal', 'assembly', 'structural', 'outer', 'hnh', 45, 'exonuclease', 'atp-dependent', 'polymerase', 'regulator', 'phosphatase', 'homing', 'anti-sigma', 'protease', 'transcription', 'factor', 'hub', 'transcriptional', 'ligase', 'rna', 'serine/threonine', 'portal',  'prohead', 'capsid', 'methylase', 'tape', 'measure', 'primase', 'ssdna', 'exodeoxyribonuclease', 'srd', 'methyltransferase', 'binding', 'atpase', 'binding,', 'repair,', 'pre-synthesis', 'thymidylate', 'synthase',  'core', 'sir2-like', 'activator', 'middle', 'period']
+    print(len(putative_candidate))
+    dic_list_putative = dict(
+        (name, protein_dic_putative_words[name]) for name in putative_candidate if name in protein_dic_putative_words)
 
 
+    #wordcloud = WordCloud(width=1000, height=500).generate_from_frequencies(dic_list_putative)
 
+    #plt.figure(figsize=(15, 8))
+    #plt.imshow(wordcloud)
+    #names = list(dic_list_putative.keys())
+    #values = list(dic_list_putative.values())
+    #plt.barh(names, values)
+    #plt.ylabel('Putative', fontweight='bold', color='black', fontsize='15', horizontalalignment='center')
+    #plt.yticks(fontsize=10)
+    #plt.show()
+########################################################################################################################
 
-    # print(sorted(protein_dic.keys()))
-
-    #print(word)
-    #print(len(unique))
-    #return protein_dic
-    #filt_keys=['riia lysis inhibitor']  # This part is example for validating the dictionary
-    #return protein_dic
-    #search=[protein_dic[key] for key in filt_keys]     # It shows the number of sequence ID for protein name example
-    #for key, value in sorted(protein_dic.items()):    # It shows the number of values in the keys
-     #   print(key, len(value))
-    #print(sorted(protein_dic.keys()))
-
-#def bracket_remove(file_name):
- #   protein_name_candidate = []
-  #  for seq_record in SeqIO.parse(file_name, "fasta"):  # open the fasta file
-   #     all_species.append(seq_record.description.split('|'))
-    #for protein in all_species:
-     #   protein_name_candidate.append(protein[2])
-'''
 
