@@ -10,8 +10,6 @@
 
 ## Authors
 - [Jeesu Lee](https://github.com/jeesu-97)
-- [Eunkyu Bang](https://github.com/Eunkyu-B)
-- [Ho-min Park](https://github.com/powersimmani)
 - [Hyunjin Shim](https://github.com/hjshim)
 
 
